@@ -44,16 +44,16 @@ function renderCart() {
 
   cart.forEach((item) => {
     const li = document.createElement("li");
-    li.innerHTML = `${item.name} - $${item.price} <button class="remove-from-cart-btn" data-id="${item.id}">Remove</button>`;
+    li.innerHTML = `${item.name} - $${item.price} <button class="remove-from-cart-btn" data-cart-id="${item.cartId}">Remove</button>`;
     cartList.appendChild(li);
   });
 
   // Add event listeners to remove buttons
-  document.querySelectorAll(".remove-from-cart-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      removeFromCart(parseInt(button.dataset.id));
-    });
+ document.querySelectorAll(".remove-from-cart-btn").forEach((button) => {
+  button.addEventListener("click", () => {
+    removeFromCart(parseInt(button.dataset.cartId));
   });
+});
 }
 
 // Add item to cart
@@ -61,19 +61,20 @@ function addToCart(productId) {
   const cart = loadCart();
   const product = products.find((p) => p.id === productId);
   if (product) {
-    cart.push({ ...product }); // Ensure a new instance is added
+    const uniqueCartItem = { ...product, cartId: Date.now() }; 
+    cart.push(uniqueCartItem);
     saveCart(cart);
     renderCart();
   }
 }
 
-
-function removeFromCart(productId) {
-	let cart = loadCart();
-  cart = cart.filter((item) => item.id !== productId);
+function removeFromCart(cartId) {
+  let cart = loadCart();
+  cart = cart.filter((item) => item.cartId !== cartId);
   saveCart(cart);
   renderCart();
 }
+
 
 function clearCart() {
 	sessionStorage.removeItem("cart");
